@@ -10,6 +10,7 @@ class Requests
 {
     private   $typeOfRequest;
     private   $uri;
+    public    $response;
     protected $client;
 
     public function __construct(string $typeParam)
@@ -21,32 +22,39 @@ class Requests
     public function setURI($uri)
     {
         $this->uri = $uri;
-
+        // Produção, Teste, Homologação
         return $this;
     }
 
     public function requests()
     {
-        $this->client->request($this->typeOfRequest, $this->uri);
+        $this->response = $this->client->request($this->typeOfRequest, $this->uri);
+        return $this;
+    }
+
+    public function getResponse(string $type)
+    {
+        $response = [
+            'bodyCode' => [
+                'statusCode' => $this->response->getStatusCode(),
+                'body' => json_decode($this->response->getBody(), true)
+            ],
+            'body' => [
+                'body' => json_decode($this->response->getBody(), true)
+            ]
+        ];
+
+        return $response[$type];
     }
 }
 
 use Facebook\Requests;
 
-(new Requests('GET'))
-    ->setURI('localhost:3000/nome/michael')
+$objectRequest = new Requests('GET');
+
+$request = $objectRequest
+    ->setURI('localhost:3000/nome/michael')// Curso 500
     ->requests();
 
-//$client = new GuzzleHttp\Client();
-//
-//$res = $client->request('GET', 'localhost:3000/nome/michael');
-//
-//echo $res->getStatusCode(),"<br /><br />";
-//
-//print_r($res->getHeader('content-type'));
-//
-//$dados = json_decode($res->getBody(), true);
-//
-//echo "<br /><br />";
-//
-//print_r($dados['nome']);
+echo "<pre>";
+print_r($request->getResponse('body'));
