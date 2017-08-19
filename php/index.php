@@ -1,17 +1,52 @@
 <?php
 
+namespace Facebook;
+
 require 'vendor/autoload.php';
 
-$client = new GuzzleHttp\Client();
+use GuzzleHttp\Client;
 
-$res = $client->request('GET', 'localhost:3000/nome/michael');
+class Requests
+{
+    private   $typeOfRequest;
+    private   $uri;
+    protected $client;
 
-echo $res->getStatusCode(),"<br /><br />";
+    public function __construct(string $typeParam)
+    {
+        $this->typeOfRequest = $typeParam;
+        $this->client = new Client();
+    }
 
-print_r($res->getHeader('content-type'));
+    public function setURI($uri)
+    {
+        $this->uri = $uri;
 
-$dados = json_decode($res->getBody(), true);
+        return $this;
+    }
 
-echo "<br /><br />";
+    public function requests()
+    {
+        $this->client->request($this->typeOfRequest, $this->uri);
+    }
+}
 
-print_r($dados['nome']);
+use Facebook\Requests;
+
+(new Requests('GET'))
+    ->setURI('localhost:3000/nome/michael')
+    ->requests();
+
+//$client = new GuzzleHttp\Client();
+//
+//$res = $client->request('GET', 'localhost:3000/nome/michael');
+//
+//echo $res->getStatusCode(),"<br /><br />";
+//
+//print_r($res->getHeader('content-type'));
+//
+//$dados = json_decode($res->getBody(), true);
+//
+//echo "<br /><br />";
+//
+//print_r($dados['nome']);
